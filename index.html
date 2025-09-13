@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Portfolio</title>
+    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.162.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.162.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+    </script>
+    <script type="text/javascript">
+    (function(){
+            emailjs.init({
+              publicKey: "4mjARYflaqw887JCK",
+            });
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            /* Correction: Définit un fond sombre pour le corps */
+            background-color: #1a1a1a;
+            color: white; /* Pour s'assurer que le texte est visible */
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        #content {
+            position: relative;
+            color: white;
+            z-index: 1;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        nav.scrolled {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            position: relative;
+            letter-spacing: 0.5px;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: #64ffda;
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        nav a.active {
+            color: #64ffda;
+        }
+
+        section {
+            min-height: 100vh;
+            padding: 6rem 2rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        #hero {
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 4.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #64ffda, #00bcd4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #64ffda;
+            letter-spacing: -0.5px;
+            font-weight: 600;
+        }
+
+        h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 500;
+            letter-spacing: -0.3px;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: #64ffda;
+            color: #1a1a1a;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 0.5rem;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(100, 255, 218, 0.3);
+        }
+
+        .btn.secondary {
+            background: transparent;
+            border: 2px solid #64ffda;
+            color: #64ffda;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .social-links a {
+            color: white;
+            font-size: 1.5rem;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: #64ffda;
+        }
+
+        .projects, .services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .project-card, .service-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+
+        .project-card:hover, .service-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .project-card h3, .service-card h3 {
+            margin-bottom: 1rem;
+            color: #64ffda;
+            font-size: 1.25rem;
+        }
+
+        .project-card p, .service-card p {
+            line-height: 1.6;
+            font-weight: 300;
+            letter-spacing: 0.2px;
+        }
+
+        .service-card {
+            text-align: center;
+        }
+
+        .service-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #64ffda;
+        }
+
+        #contact {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 4rem 2rem;
+        }
+        .contact-form {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group label {
+            position: absolute;
+            left: 0.8rem;
+            top: 0.8rem;
+            transition: all 0.3s;
+            pointer-events: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+            letter-spacing: 0.2px;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+            letter-spacing: 0.2px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+        }
+
+        .form-group input:focus ~ label,
+        .form-group textarea:focus ~ label,
+        .form-group input:not(:placeholder-shown) ~ label,
+        .form-group textarea:not(:placeholder-shown) ~ label {
+            top: -1.5rem;
+            left: 0;
+            font-size: 0.875rem;
+            color: #64ffda;
+            font-weight: 400;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            color: white;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+            letter-spacing: 0.2px;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #64ffda;
+            box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2);
+        }
+
+        .cv-section {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .cv-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .success-message {
+            display: none;
+            background: rgba(100, 255, 218, 0.1);
+            border: 1px solid #64ffda;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            text-align: center;
+            color: #64ffda;
+            font-weight: 400;
+            letter-spacing: 0.2px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: color 0.3s;
+        }
+
+        .menu-toggle:hover {
+            color: #64ffda;
+        }
+
+        .menu-toggle-active {
+            display: block;
+        }
+
+        nav.menu-active ul {
+            display: flex;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 3rem;
+            }
+            h2 {
+                font-size: 2rem;
+            }
+            .subtitle {
+                font-size: 1.25rem;
+            }
+            .services, .projects {
+                grid-template-columns: 1fr;
+            }
+            nav {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1.5rem 2rem;
+            }
+            nav ul {
+                display: none;
+                flex-direction: column;
+                gap: 1rem;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                padding: 1rem 0;
+                text-align: center;
+            }
+            nav ul.active {
+                display: flex;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .contact-form {
+                padding: 1.5rem;
+                max-width: 100%;
+            }
+            .btn {
+                width: 100%;
+                padding: 1rem 0;
+            }
+            .social-links {
+                gap: 1rem;
+            }
+            .social-links a {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <canvas id="bg"></canvas>
+
+    <nav id="mainNav">
+        <ul>
+            <li><a href="#hero" class="active">Accueil</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#projects">Projets</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <button id="menuToggle" class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+    
+
+    <div id="content">
+        <section id="hero">
+            <div class="container">
+                <h1>Ange-Marie GOUDALO</h1>
+                <p class="subtitle">Ingénieur Informatique</p>
+                
+                <div class="cv-section">
+                    <h3>Télécharger mon CV</h3>
+                    <div class="cv-buttons">
+                        <a href="CV.pdf" class="btn" download>CV en Français</a>
+                        <a href="Eng_cv.pdf" class="btn secondary" download>CV in English</a>
+                    </div>
+                </div>
+
+                <div class="social-links">
+                    <a href="https://github.com/Chremaghost" target="_blank"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/ange-marie-goudalo-517468353" target="_blank"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <section id="services">
+            <div class="container">
+                <h2>Mes Services</h2>
+                <div class="services">
+                    <div class="service-card">
+                        <i class="fas fa-code"></i>
+                        <h3>Développement Web</h3>
+                        <p>Création de sites web responsives et applications web modernes avec les dernières technologies.</p>
+                    </div>
+                    <div class="service-card">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h3>Applications Mobiles</h3>
+                        <p>Développement d'applications mobiles natives et cross-platform pour iOS et Android.</p>
+                    </div>
+                    <div class="service-card">
+                        <i class="fas fa-server"></i>
+                        <h3>Backend Development</h3>
+                        <p>Architecture et développement de solutions backend robustes et évolutives.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects">
+            <div class="container">
+                <h2>Mes Projets</h2>
+                <div class="projects">
+                    <div class="project-card">
+                        <h3>Projet 1</h3>
+                        <p>Description du projet avec les technologies utilisées et les défis relevés.</p>
+                    </div>
+                    <div class="project-card">
+                        <h3>Projet 2</h3>
+                        <p>Description du projet avec les technologies utilisées et les défis relevés.</p>
+                    </div>
+                    <div class="project-card">
+                        <h3>Projet 3</h3>
+                        <p>Description du projet avec les technologies utilisées et les défis relevés.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <div class="container">
+                <form class="contact-form" id="contactForm">
+                    <h2>Me Contacter</h2>
+                    <div class="form-group">
+                        <input type="text" id="name" name="name" required placeholder=" ">
+                        <label for="name">Votre nom</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" required placeholder=" ">
+                        <label for="email">Votre email</label>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="message" name="message" rows="5" required placeholder=" "></textarea>
+                        <label for="message">Votre message</label>
+                    </div>
+                    <button type="submit" class="btn">Envoyer</button>
+                    <div class="success-message" id="successMessage">
+                        Message envoyé avec succès ! Je vous répondrai dans les plus brefs délais.
+                    </div>
+                </form>
+            </div>
+            <script>
+                (function(){
+                    emailjs.init("4mjARYflaqw887JCK");
+                })();
+            
+                document.getElementById('contactForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+            
+                    const serviceID = 'service_tuooopt';
+                    const templateID = 'template_tgwocgr';
+            
+                    emailjs.sendForm(serviceID, templateID, this)
+                        .then(() => {
+                            const successMessage = document.getElementById('successMessage');
+                            successMessage.style.display = 'block';
+                            this.reset();
+                            setTimeout(() => {
+                                successMessage.style.display = 'none';
+                            }, 5000);
+                        }, (err) => {
+                            console.error('Failed to send email. Error: ', err);
+                        });
+                });
+            </script>
+        </section>
+    </div>
+
+    <script>
+        // JS pour le menu mobile
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.querySelector('nav ul');
+    
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+    </script>
+    
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({
+            canvas: document.querySelector('#bg'),
+            antialias: true
+        });
+
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.position.setZ(30);
+
+        function addStar() {
+            const geometry = new THREE.SphereGeometry(0.25, 24, 24);
+            const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
+            const star = new THREE.Mesh(geometry, material);
+
+            const [x, y, z] = Array(3).fill().map(() => THREE.MathUtils.randFloatSpread(100));
+            star.position.set(x, y, z);
+            scene.add(star);
+        }
+
+        Array(200).fill().forEach(addStar);
+
+        const pointLight = new THREE.PointLight(0xffffff);
+        pointLight.position.set(5, 5, 5);
+        const ambientLight = new THREE.AmbientLight(0xffffff);
+        scene.add(pointLight, ambientLight);
+
+        // Correction : Utilisez un fond de couleur unie au lieu de la texture d'image.
+        // C'est la solution la plus simple pour éviter les problèmes de chargement CORS sur GitHub Pages.
+        scene.background = new THREE.Color(0x1a1a1a);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            scene.rotation.y += 0.0005;
+            scene.rotation.x += 0.0002;
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('nav a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop - sectionHeight / 3) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        animate();
+    </script>
+</body>
+</html>
