@@ -774,11 +774,10 @@
 
         popupMessage.textContent = message;
 
-        // Couleur selon le type
         if (type === "success") {
-            popup.style.background = "#4caf50"; // vert
+            popup.style.background = "#4caf50";
         } else {
-            popup.style.background = "#ff4d4d"; // rouge
+            popup.style.background = "#ff4d4d";
         }
 
         popup.style.display = "block";
@@ -789,7 +788,7 @@
             popup.style.opacity = "0";
             setTimeout(() => {
                 popup.style.display = "none";
-                popup.style.transition = ""; // reset
+                popup.style.transition = ""; 
             }, 500);
         }, 4000);
     }
